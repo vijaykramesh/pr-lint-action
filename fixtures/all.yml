@@ -1,0 +1,4 @@
+projects: ['PROJ']
+check_title: true
+check_branch: true
+ignore_case: true
