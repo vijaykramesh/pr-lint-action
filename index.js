@@ -14,8 +14,10 @@ Toolkit.run(
   async tools => {
     const repoInfo = {
       owner: tools.context.payload.repository.owner.login,
-      repo: tools.context.payload.repository.name
+      repo: tools.context.payload.repository.name,
+      ref: tools.context.payload.pull_request.head.ref
     }
+
     const config = {
       ...defaults,
       ...(await getConfig(tools.github, CONFIG_FILENAME, repoInfo))
@@ -26,15 +28,15 @@ Toolkit.run(
       tools.context.payload.pull_request.title
 
     const head_branch = config.ignore_case ?
-      tools.context.payload.pull_request.head_ref_name.toLowerCase() :
-      tools.context.payload.pull_request.head_ref_name
+      tools.context.payload.pull_request.head.ref.toLowerCase() :
+      tools.context.payload.pull_request.head.ref
 
     const projects = config.projects.map(project => config.ignore_case ? project.toLowerCase() : project)
     const title_passed = (() => {
       if (config.check_title) {
         // check the title matches [PROJECT-1234] somewhere
         if (!projects.some(project => title.match(new RegExp('\\[' + project + '-\\d*\\]')))) {
-          tools.log('PR title does not contain approved project')
+          tools.log('PR title ' + title + ' does not contain approved project')
           return false
         }
       }
@@ -45,7 +47,7 @@ Toolkit.run(
       // check the branch matches PROJECT-1234 or PROJECT_1234 somewhere
       if (config.check_branch) {
         if (!projects.some(project => head_branch.match(new RegExp(project + '[-_]\\d*')))) {
-          tools.log('PR branch does not contain an approved project')
+          tools.log('PR branch ' + head_branch + ' does not contain an approved project')
           return false
         }
       }

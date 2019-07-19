@@ -6,11 +6,12 @@ const CONFIG_PATH = '.github'
 /**
  * @returns {Promise<Object.<string, string | string[]>>}
  */
-module.exports = async function getConfig(github, fileName, { owner, repo }) {
+module.exports = async function getConfig(github, fileName, { owner, repo, ref }) {
   try {
     const response = await github.repos.getContents({
       owner,
       repo,
+      ref: ref,
       path: path.posix.join(CONFIG_PATH, fileName)
     })
 

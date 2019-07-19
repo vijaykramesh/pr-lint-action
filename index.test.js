@@ -31,6 +31,7 @@ describe('pr-lint-action', () => {
   it('fails if check_title is true and title does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('title.yml'))
 
 
@@ -44,6 +45,7 @@ describe('pr-lint-action', () => {
   it('passes if check_title is false and title does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('branch.yml'))
 
 
@@ -57,6 +59,7 @@ describe('pr-lint-action', () => {
   it('passes if check_title is true and title matches', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('title.yml'))
 
 
@@ -70,6 +73,7 @@ describe('pr-lint-action', () => {
   it('fails if check_branch is true and branch does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('branch.yml'))
 
 
@@ -83,6 +87,7 @@ describe('pr-lint-action', () => {
   it('passes if check_branch is false and branch does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('title.yml'))
 
 
@@ -96,6 +101,7 @@ describe('pr-lint-action', () => {
   it('passes if check_branch is true and branch matches', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('branch.yml'))
 
 
@@ -109,6 +115,7 @@ describe('pr-lint-action', () => {
   it('fails if check_branch and check_title is true and title does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('all.yml'))
 
 
@@ -122,6 +129,7 @@ describe('pr-lint-action', () => {
   it('fails if check_branch and check_title is true and title does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('all.yml'))
 
     tools.context.payload = pullRequestOpenedFixture(bad_title_and_good_branch)
@@ -134,6 +142,7 @@ describe('pr-lint-action', () => {
   it('passes if check_branch and check_title is true and both match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('all.yml'))
 
 
@@ -146,6 +155,7 @@ describe('pr-lint-action', () => {
   it('passes if ignore_case and lower case title/branch', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('all.yml'))
 
 
@@ -159,6 +169,7 @@ describe('pr-lint-action', () => {
 it('fails if not ignore_case and lower case title/branch', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
       .reply(200, configFixture('no-ignore-case.yml'))
 
 
@@ -206,7 +217,9 @@ function pullRequestOpenedFixture({ title, ref_name }) {
     pull_request: {
       number: 1,
       title: title,
-      head_ref_name: ref_name
+      head: {
+        ref: ref_name
+      }
     },
     repository: {
       name: 'pr-lint-action-test',

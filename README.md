@@ -1,13 +1,13 @@
 # pr-lint-action
 
-A GitHub Action that verifies your pull request contains a reference to a ticket.  It will optionally check the PR title contains `[PROJ-1234]` and the branch contains PROJ-1234 or PROJ_1234.  This helps ensure every PR gets mapped to a ticket in Jira!
+A GitHub Action that verifies your pull request contains a reference to a ticket.  It will optionally check the PR title contains `[PROJ-1234]` and the branch contains `PROJ-1234` or `PROJ_1234`.  This helps ensure every PR gets mapped to a ticket in Jira.
 
 ## Usage
 
-Add `.github/pr-lint.workflow` with the following:
+Add `.github/main.workflow` with the following:
 
 ```
-workflow "PR Lint Action" {
+workflow "Lint your PRs" {
   on = "pull_request"
   resolves = "PR Lint Action"
 }
@@ -50,3 +50,7 @@ PASS  ./index.test.js
     ✓ passes if ignore_case and lower case title/branch (55ms)
     ✓ fails if not ignore_case and lower case title/branch (109ms)
 ```
+
+## Contributing
+
+If you have other things worth automatically checking for in your PRs, please submit a pull request.
