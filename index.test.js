@@ -19,6 +19,21 @@ describe('pr-lint-action', () => {
   const good_title_and_bad_branch = { title: '[PROJ-1234] a good PR title', ref_name: 'fix_things' }
   const bad_title_and_good_branch = { title: 'no ticket in me', ref_name: 'bug/PROJ_1234/a_good_branch' }
   const lower_case_good_title_and_branch = { title: '[proj-1234] a lower case good title', ref_name: 'bug/proj_1234/a_good_lowercase_branch' }
+  const good_commits = [
+    { commit: { message: "PROJ-1234 Commit 1" } },
+    { commit: { message: "PROJ-1234 Commit 2" } },
+    { commit: { message: "PROJ-1234 Commit 3" } }
+  ];
+  const lower_case_good_commits = [
+    { commit: { message: "PROJ-1234 Commit 1" } },
+    { commit: { message: "PROJ-1234 Commit 2" } },
+    { commit: { message: "PROJ-1234 Commit 3" } }
+  ];
+  const bad_commits = [
+    { commit: { message: "PRJ-123 Commit 1" } },
+    { commit: { message: "PROJ-1234 Commit 2" } },
+    { commit: { message: "Commit 3" } }
+  ];
 
   beforeEach(() => {
     // Create a new Toolkit instance
@@ -112,13 +127,70 @@ describe('pr-lint-action', () => {
     expect.assertions(1)
   })
 
+  it('passes if check_commits is true and all commits match', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('commits.yml'))
+
+    mockGetPRCommitListRequest(good_commits);
+
+    tools.context.payload = pullRequestOpenedFixture(good_title_and_branch)
+    await action(tools)
+    expect(tools.exit.success).toHaveBeenCalled()
+    expect.assertions(1)
+  })
+
+  it('fails if check_commits is true and some commits do not match', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('commits.yml'))
+
+      mockGetPRCommitListRequest(bad_commits)
+
+    tools.context.payload = pullRequestOpenedFixture(good_title_and_branch)
+    await action(tools)
+    expect(tools.exit.failure).toHaveBeenCalledWith("PR Linting Failed")
+    expect.assertions(1)
+  })
+
+  it('passes if check_commits is false and all commits match', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('title.yml'))
+
+    mockGetPRCommitListRequest(good_commits);
+
+    tools.context.payload = pullRequestOpenedFixture(good_title_and_branch)
+    await action(tools)
+    expect(tools.exit.success).toHaveBeenCalled()
+    expect.assertions(1)
+  })
+
+  it('passes if check_commits is false and some commits do not match', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('title.yml'))
+
+      mockGetPRCommitListRequest(bad_commits)
+
+    tools.context.payload = pullRequestOpenedFixture(good_title_and_branch)
+    await action(tools)
+    expect(tools.exit.success).toHaveBeenCalled()
+    expect.assertions(1)
+  })
+
   it('fails if check_branch and check_title is true and title does not match', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
       .query(true)
       .reply(200, configFixture('all.yml'))
 
-
+    mockGetPRCommitListRequest(good_commits);
+    
     tools.context.payload = pullRequestOpenedFixture(bad_title_and_good_branch)
     await action(tools)
     expect(tools.exit.failure).toHaveBeenCalledWith("PR Linting Failed")
@@ -131,6 +203,8 @@ describe('pr-lint-action', () => {
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
       .query(true)
       .reply(200, configFixture('all.yml'))
+
+    mockGetPRCommitListRequest(good_commits);
 
     tools.context.payload = pullRequestOpenedFixture(bad_title_and_good_branch)
     await action(tools)
@@ -145,6 +219,7 @@ describe('pr-lint-action', () => {
       .query(true)
       .reply(200, configFixture('all.yml'))
 
+    mockGetPRCommitListRequest(good_commits);
 
     tools.context.payload = pullRequestOpenedFixture(good_title_and_branch)
     await action(tools)
@@ -158,6 +233,7 @@ describe('pr-lint-action', () => {
       .query(true)
       .reply(200, configFixture('all.yml'))
 
+    mockGetPRCommitListRequest(good_commits);
 
     tools.context.payload = pullRequestOpenedFixture(lower_case_good_title_and_branch)
     await action(tools)
@@ -165,20 +241,42 @@ describe('pr-lint-action', () => {
     expect.assertions(1)
   })
 
+  it('passes if ignore_case and lower case commits', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('all.yml'))
 
-it('fails if not ignore_case and lower case title/branch', async () => {
+    mockGetPRCommitListRequest(lower_case_good_commits);
+
+    tools.context.payload = pullRequestOpenedFixture(lower_case_good_title_and_branch)
+    await action(tools)
+    expect(tools.exit.success).toHaveBeenCalled()
+    expect.assertions(1)
+  })
+
+  it('fails if not ignore_case and lower case title/branch', async () => {
     nock('https://api.github.com')
       .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
       .query(true)
       .reply(200, configFixture('no-ignore-case.yml'))
 
+    mockGetPRCommitListRequest(good_commits);
 
     tools.context.payload = pullRequestOpenedFixture(lower_case_good_title_and_branch)
     await action(tools)
     expect(tools.exit.failure).toHaveBeenCalledWith("PR Linting Failed")
     expect.assertions(1)
   })
- })
+})
+
+
+function mockGetPRCommitListRequest(commits) {
+  nock('https://api.github.com')
+    .get('/repos/vijaykramesh/pr-lint-action-test/pulls/1/commits')
+    .query(true)
+    .reply(200, commits);
+}
 
 function encodeContent(content) {
   return Buffer.from(content).toString('base64')

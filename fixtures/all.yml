@@ -1,4 +1,5 @@
 projects: ['PROJ']
 check_title: true
 check_branch: true
+check_commits: true
 ignore_case: true
