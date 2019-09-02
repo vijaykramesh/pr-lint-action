@@ -7,15 +7,18 @@ const defaults = {
   projects: ['PROJ'],
   check_title: true,
   check_branch: false,
+  check_commits: false,
   ignore_case: false
 }
 
 Toolkit.run(
   async tools => {
+    const { repository, pull_request } = tools.context.payload
+
     const repoInfo = {
-      owner: tools.context.payload.repository.owner.login,
-      repo: tools.context.payload.repository.name,
-      ref: tools.context.payload.pull_request.head.ref
+      owner: repository.owner.login,
+      repo: repository.name,
+      ref: pull_request.head.ref
     }
 
     const config = {
@@ -24,18 +27,18 @@ Toolkit.run(
     }
 
     const title = config.ignore_case ?
-      tools.context.payload.pull_request.title.toLowerCase() :
-      tools.context.payload.pull_request.title
+      pull_request.title.toLowerCase() :
+      pull_request.title
 
     const head_branch = config.ignore_case ?
-      tools.context.payload.pull_request.head.ref.toLowerCase() :
-      tools.context.payload.pull_request.head.ref
+      pull_request.head.ref.toLowerCase() :
+      pull_request.head.ref
 
     const projects = config.projects.map(project => config.ignore_case ? project.toLowerCase() : project)
     const title_passed = (() => {
       if (config.check_title) {
         // check the title matches [PROJECT-1234] somewhere
-        if (!projects.some(project => title.match(new RegExp('\\[' + project + '-\\d*\\]')))) {
+        if (!projects.some(project => title.match(createWrappedProjectRegex(project)))) {
           tools.log('PR title ' + title + ' does not contain approved project')
           return false
         }
@@ -46,7 +49,7 @@ Toolkit.run(
     const branch_passed = (() => {
       // check the branch matches PROJECT-1234 or PROJECT_1234 somewhere
       if (config.check_branch) {
-        if (!projects.some(project => head_branch.match(new RegExp(project + '[-_]\\d*')))) {
+        if (!projects.some(project => head_branch.match(createProjectRegex(project)))) {
           tools.log('PR branch ' + head_branch + ' does not contain an approved project')
           return false
         }
@@ -54,7 +57,28 @@ Toolkit.run(
       return true
     })()
 
-    const statuses = [title_passed, branch_passed]
+    const commits_passed = await (async () => {
+      // check the branch matches PROJECT-1234 or PROJECT_1234 somewhere
+      if (config.check_commits) {
+        const listCommitsParams = {
+          owner: repository.owner.login,
+          repo: repository.name,
+          pull_number: pull_request.number
+        }
+        const commitsInPR = (await tools.github.pulls.listCommits(listCommitsParams)).data
+        const failedCommits = findFailedCommits(projects, commitsInPR, config.ignore_case);
+
+        if(failedCommits.length) {
+          failedCommits.forEach(
+            failedCommit => tools.log('Commit message \'' + failedCommit + '\' does not contain an approved project')
+          )
+          return false
+        }
+      }
+      return true
+    })()
+
+    const statuses = [title_passed, branch_passed, commits_passed]
 
     if (statuses.some(status => status === false )){
       tools.exit.failure("PR Linting Failed")
@@ -64,3 +88,24 @@ Toolkit.run(
   },
   { event: ['pull_request.opened', 'pull_request.edited', 'pull_request.synchronize'], secrets: ['GITHUB_TOKEN'] }
 )
+
+function findFailedCommits(projects, commitsInPR, ignoreCase) {
+  const failedCommits = [];
+  projects.forEach(project => {
+    commitsInPR.forEach(commit => {
+      const commitMessage = ignoreCase ? commit.commit.message.toLowerCase() : commit.commit.message
+      if (!commitMessage.match(createProjectRegex(project))) {
+        failedCommits.push(commitMessage);
+      }
+    });
+  });
+  return failedCommits;
+}
+
+function createProjectRegex(project) {
+  return new RegExp(project + '[-_]\\d*')
+}
+
+function createWrappedProjectRegex(project) {
+  return new RegExp('\\[' + project + '-\\d*\\]')
+}
