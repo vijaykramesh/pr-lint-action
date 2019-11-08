@@ -10,18 +10,19 @@ A GitHub Action that verifies your pull request contains a reference to a ticket
 
 ## Usage
 
-Add `.github/main.workflow` with the following:
+Add `.github/workflows/main.yml` with the following:
 
 ```
-workflow "Lint your PRs" {
-  on = "pull_request"
-  resolves = "PR Lint Action"
-}
+name: PR Lint
+on: [pull_request]
+jobs:
+  pr_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: vijaykramesh/pr-lint-action@v1.0
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-action "PR Lint Action" {
-  uses = "vijaykramesh/pr-lint-action@master"
-  secrets = ["GITHUB_TOKEN"]
-}
 ```
 
 ## Configuration
