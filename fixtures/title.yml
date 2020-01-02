@@ -2,3 +2,4 @@ projects: ['PROJ']
 check_title: true
 check_branch: false
 ignore_case: true
+wrap_title: false

@@ -8,7 +8,8 @@ const defaults = {
   check_title: true,
   check_branch: false,
   check_commits: false,
-  ignore_case: false
+  ignore_case: false,
+  wrap_title: true
 }
 
 Toolkit.run(
@@ -38,9 +39,20 @@ Toolkit.run(
     const title_passed = (() => {
       if (config.check_title) {
         // check the title matches [PROJECT-1234] somewhere
-        if (!projects.some(project => title.match(createWrappedProjectRegex(project)))) {
-          tools.log('PR title ' + title + ' does not contain approved project')
-          return false
+        let isTitleValid = true
+        if (config.wrap_title) {
+          if (!projects.some(project => title.match(createWrappedProjectRegex(project)))) {
+            isTitleValid = false
+          }
+        } else {
+          if (!projects.some(project => title.match(createProjectRegex(project)))) {
+            isTitleValid = false
+          }
+        }
+
+        if (isTitleValid === false) {
+            tools.log('PR title ' + title + ' does not contain approved project')
+            return false
         }
       }
       return true
