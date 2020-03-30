@@ -1,0 +1,29 @@
+name: 'Pull Request Linter GitHub Action'
+description: 'GitHub Action that lits a pull request so branch name, PR title and commits match a pattern'
+author: 'Tamim Khan, Kantox'
+runs:
+  using: 'node12'
+  main: 'index.js'
+inputs:
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
+  projects:
+    description: 'Accepted sequences for project abbrev. Multiple sequences can be separated by vertical bar like "ABC|DEF"'
+    required: true
+    default: 'PROJ'
+  check-title:
+    description: 'Check title of the PR contains "[PREFIX-id]"'
+    default: true
+  check-branch:
+    description: 'Check branch name contains "PREFIX-id"'
+    default: false
+  check-commits:
+    description: 'Check commit titles contain "[PREFIX-id]"'
+    default: false
+  ignore-case:
+    description: 'Whether to match case when searching for the patterns'
+    default: false
+branding:
+  icon: 'edit-3'
+  color: 'green'
