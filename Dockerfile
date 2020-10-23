@@ -7,7 +7,8 @@ LABEL "com.github.actions.icon"="book-open"
 LABEL "com.github.actions.color"="blue"
 
 # Copy the package.json and package-lock.json
-COPY package*.json ./
+COPY package.json .
+COPY package-lock.json .
 
 # Install dependencies
 RUN npm ci
