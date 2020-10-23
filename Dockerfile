@@ -8,10 +8,10 @@ LABEL "com.github.actions.color"="blue"
 
 # Copy the package.json and package-lock.json
 COPY package.json .
-COPY package-lock.json .
+COPY yarn.lock .
 
 # Install dependencies
-RUN npm ci
+RUN yarn install --frozen-lockfile --non-interactive
 
 # Copy the rest of your action's code
 COPY . .
