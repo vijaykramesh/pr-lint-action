@@ -27,7 +27,7 @@ describe('pr-lint-action', () => {
   const lower_case_good_commits = [
     { commit: { message: "PROJ-1234 Commit 1" } },
     { commit: { message: "PROJ-1234 Commit 2" } },
-    { commit: { message: "PROJ-1234 Commit 3" } }
+    { commit: { message: "abc-1234 Commit 3" } }
   ];
   const bad_commits = [
     { commit: { message: "PRJ-123 Commit 1" } },
