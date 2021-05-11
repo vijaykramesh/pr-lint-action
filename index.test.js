@@ -17,6 +17,7 @@ describe('pr-lint-action', () => {
   const bad_title_and_branch = { title: 'no ticket in me', ref_name: 'no-ticket-in-me' }
   const good_title_and_branch = { title: '[PROJ-1234] a good PR title', ref_name: 'bug/PROJ-1234/a_good_branch' }
   const good_title_and_bad_branch = { title: '[PROJ-1234] a good PR title', ref_name: 'fix_things' }
+  const good_title_and_good_dependabot_branch = { title: '[PROJ-1234] a good PR title', ref_name: 'dependabot/bundler/rake-12.3.3' }
   const bad_title_and_good_branch = { title: 'no ticket in me', ref_name: 'bug/PROJ_1234/a_good_branch' }
   const lower_case_good_title_and_branch = { title: '[proj-1234] a lower case good title', ref_name: 'bug/proj_1234/a_good_lowercase_branch' }
   const gitflow_title_and_good_branch = { title: '[proj-1234] bug PROJ 1234 a good branch branch prefix in me', ref_name: 'bug/PROJ_1234/a_good_branch' }
@@ -137,6 +138,20 @@ describe('pr-lint-action', () => {
 
 
     tools.context.payload = pullRequestOpenedFixture(bad_title_and_good_branch)
+
+    await action(tools)
+    expect(tools.exit.success).toHaveBeenCalled()
+    expect.assertions(1)
+  })
+
+  it('passes if check_branch is true and branch follows dependabot format', async () => {
+    nock('https://api.github.com')
+      .get('/repos/vijaykramesh/pr-lint-action-test/contents/.github/pr-lint.yml')
+      .query(true)
+      .reply(200, configFixture('branch.yml'))
+
+
+    tools.context.payload = pullRequestOpenedFixture(good_title_and_good_dependabot_branch)
 
     await action(tools)
     expect(tools.exit.success).toHaveBeenCalled()

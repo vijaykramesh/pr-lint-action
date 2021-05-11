@@ -51,8 +51,11 @@ Toolkit.run(
     })()
 
     const branch_passed = (() => {
-      // check the branch matches PROJECT-1234 or PROJECT_1234 somewhere
       if (config.check_branch) {
+        if (head_branch.match(/dependabot\/.+/)) {
+          return true
+        }
+        // check the branch matches PROJECT-1234 or PROJECT_1234 somewhere
         if (!projects.some(project => head_branch.match(createProjectRegex(project)))) {
           tools.log('PR branch ' + head_branch + ' does not contain an approved project with format PROJECT-1234 or PROJECT_1234')
           return false
