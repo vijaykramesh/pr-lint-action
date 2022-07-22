@@ -91,18 +91,18 @@ Toolkit.run(
 
 function findFailedCommits(projects, commitsInPR, ignoreCase) {
   const failedCommits = [];
-  projects.forEach(project => {
-    commitsInPR.forEach(commit => {
-      const commitMessage = ignoreCase ? commit.commit.message.toLowerCase() : commit.commit.message
-      if (!commitMessage.match(createProjectRegex(project))) {
-        failedCommits.push(commitMessage);
-      }
-    });
+  commitsInPR.forEach(commit => {
+    if (!projects.some(project => commit.commit.message.match(createProjectRegex(project, ignoreCase)))) {
+      failedCommits.push(commit.commit.message);
+    }
   });
   return failedCommits;
 }
 
-function createProjectRegex(project) {
+function createProjectRegex(project, ignoreCase = false) {
+  if (ignoreCase) {
+    return new RegExp(project + '[-_]\\d*', 'i')
+  }
   return new RegExp(project + '[-_]\\d*')
 }
 

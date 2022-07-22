@@ -1,4 +1,4 @@
-projects: ['PROJ']
+projects: ['PROJ', 'ABC']
 check_title: false
 check_branch: true
 ignore_case: true
