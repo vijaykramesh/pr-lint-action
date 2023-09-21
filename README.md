@@ -37,6 +37,7 @@ check_title: true
 check_branch: true
 check_commits: true
 ignore_case: true
+require_brackets: true
 ```
 
 ## Local Development
@@ -67,6 +68,8 @@ Run `yarn test` to test:
     ✓ passes if ignore_case and lower case title/branch (6 ms)
     ✓ passes if ignore_case and lower case commits (7 ms)
     ✓ fails if not ignore_case and lower case title/branch (4 ms)
+    ✓ passes if require_brakcets is false and title matches without brackets (5 ms)
+    ✓ fails if require_brackets is true or default and title matches without brackets (4 ms)
 ```
 
 ## Lint
