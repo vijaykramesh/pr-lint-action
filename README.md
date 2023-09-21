@@ -39,30 +39,39 @@ check_commits: true
 ignore_case: true
 ```
 
+## Local Development
+
+Run `yarn install` to install any dependencies needed.
+
 ## Testing
 
-Run `jest test` to test:
+Run `yarn test` to test:
 
 ```
-PASS  ./index.test.js
+ PASS  ./index.test.js
   pr-lint-action
-    ✓ fails if check_title is true and title does not match (180ms)
-    ✓ passes if check_title is false and title does not match (66ms)
-    ✓ passes if check_title is true and title matches (67ms)
-    ✓ fails if check_branch is true and branch does not match (66ms)
-    ✓ passes if check_branch is false and branch does not match (61ms)
-    ✓ passes if check_branch is true and branch matches (64ms)
-    ✓ passes if check_commits is true and all commits match (66ms)
-    ✓ fails if check_commits is true and some commits do not match (59ms)
-    ✓ passes if check_commits is false and all commits match (61ms)
-    ✓ passes if check_commits is false and some commits do not match (62ms)
-    ✓ fails if check_branch and check_title is true and title does not match (59ms)
-    ✓ fails if check_branch and check_title is true and title does not match (63ms)
-    ✓ passes if check_branch and check_title is true and both match (61ms)
-    ✓ passes if ignore_case and lower case title/branch (58ms)
-    ✓ passes if ignore_case and lower case commits (65ms)
-    ✓ fails if not ignore_case and lower case title/branch (66ms)
+    ✓ fails if check_title is true and title does not match (15 ms)
+    ✓ fails if bad title and branch (14 ms)
+    ✓ passes if check_title is false and title does not match (6 ms)
+    ✓ passes if check_title is true and title matches (5 ms)
+    ✓ fails if check_branch is true and branch does not match (5 ms)
+    ✓ passes if check_branch is false and branch does not match (5 ms)
+    ✓ passes if check_branch is true and branch matches (5 ms)
+    ✓ passes if check_commits is true and all commits match (7 ms)
+    ✓ fails if check_commits is true and some commits do not match (9 ms)
+    ✓ passes if check_commits is false and all commits match (4 ms)
+    ✓ passes if check_commits is false and some commits do not match (5 ms)
+    ✓ fails if check_branch and check_title is true and title does not match (7 ms)
+    ✓ fails if check_branch and check_title is true and title does not match (8 ms)
+    ✓ passes if check_branch and check_title is true and both match (10 ms)
+    ✓ passes if ignore_case and lower case title/branch (6 ms)
+    ✓ passes if ignore_case and lower case commits (7 ms)
+    ✓ fails if not ignore_case and lower case title/branch (4 ms)
 ```
+
+## Lint
+
+Run `yarn lint` to run ESLint.  Run `yarn lint --fix` to fix any issues that it can.
 
 ## Contributing
 
