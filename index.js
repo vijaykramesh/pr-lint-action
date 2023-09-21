@@ -10,6 +10,7 @@ const defaults = {
   check_branch: false,
   check_commits: false,
   ignore_case: false,
+  require_brackets: true,
 };
 
 function createProjectRegex(project, ignoreCase = false) {
@@ -28,8 +29,11 @@ function findFailedCommits(projects, commitsInPR, ignoreCase) {
   return failedCommits;
 }
 
-function createWrappedProjectRegex(project) {
-  return new RegExp(`\\[${project}-\\d*\\]`);
+function createWrappedProjectRegex(project, requireBrackets = false) {
+  if (requireBrackets) {
+    return new RegExp(`\\[${project}-\\d*\\]`);
+  }
+  return new RegExp(`${project}[-_]\\d*`);
 }
 
 Toolkit.run(
@@ -59,7 +63,7 @@ Toolkit.run(
     const title_passed = (() => {
       if (config.check_title) {
         // check the title matches [PROJECT-1234] somewhere
-        if (!projects.some((project) => title.match(createWrappedProjectRegex(project)))) {
+        if (!projects.some((project) => title.match(createWrappedProjectRegex(project, config.require_brackets)))) {
           tools.log(`PR title ${title} does not contain approved project with format [PROJECT-1234]`);
           return false;
         }
