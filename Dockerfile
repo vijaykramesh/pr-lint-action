@@ -22,8 +22,6 @@ LABEL "com.github.actions.color"="white"
 COPY package*.json yarn.lock ./
 
 # Install dependencies
-RUN npm install -g yarn
-
 RUN yarn install --frozen-lockfile
 
 # Copy the rest of your action's code
