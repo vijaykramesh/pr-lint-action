@@ -25,6 +25,9 @@ jobs:
 
 ```
 
+See [pr-lint-action-example-repo](https://github.com/vijaykramesh/pr-lint-action-example-repo) for an example of usage.
+
+
 ## Configuration
 
 Configure by creating a `.github/pr-lint.yml` file:
