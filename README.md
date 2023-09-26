@@ -19,7 +19,7 @@ jobs:
   pr_lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: vijaykramesh/pr-lint-action@v1.0
+    - uses: vijaykramesh/pr-lint-action@v2.3
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
